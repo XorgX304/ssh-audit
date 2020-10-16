@@ -39,8 +39,8 @@ class TestPolicy:
         '''Ensure that the BUILTIN_POLICIES struct is consistent.'''
 
         for policy_name in Policy.BUILTIN_POLICIES:
-            # Ensure that the policy name ends with "(version X)", where X is the 'version' field.
-            version_str = "(version %s)" % Policy.BUILTIN_POLICIES[policy_name]['version']
+            # Ensure that the policy name ends with " (version X)", where X is the 'version' field.
+            version_str = " (version %s)" % Policy.BUILTIN_POLICIES[policy_name]['version']
             assert(policy_name.endswith(version_str))
 
             # Ensure that each built-in policy can be loaded with Policy.load_builtin_policy().

@@ -91,6 +91,8 @@ class Policy:
         self._dh_modulus_sizes = None  # type: Optional[Dict[str, int]]
         self._server_policy = True
 
+        self._name_and_version = ''  # type: str
+
         # Ensure that only one mode was specified.
         num_modes = 0
         if policy_file is not None:
@@ -195,6 +197,8 @@ class Policy:
             raise ValueError('The policy does not have a name field.')
         if self._version is None:
             raise ValueError('The policy does not have a version field.')
+
+        self._name_and_version = "%s (version %s)" % (self._name, self._version)
 
 
     @staticmethod
@@ -393,7 +397,7 @@ macs = %s
 
     def get_name_and_version(self) -> str:
         '''Returns a string of this Policy's name and version.'''
-        return '%s (version %s)' % (self._name, self._version)
+        return self._name_and_version
 
 
     def is_server_policy(self) -> bool:
@@ -425,7 +429,8 @@ macs = %s
         if policy_name in Policy.BUILTIN_POLICIES:
             policy_struct = Policy.BUILTIN_POLICIES[policy_name]
             p = Policy(manual_load=True)
-            p._name = policy_name  # pylint: disable=protected-access
+            policy_name_without_version = policy_name[0:policy_name.rfind(' (')]
+            p._name = policy_name_without_version  # pylint: disable=protected-access
             p._version = cast(str, policy_struct['version'])  # pylint: disable=protected-access
             p._banner = cast(Optional[str], policy_struct['banner'])  # pylint: disable=protected-access
             p._compressions = cast(Optional[List[str]], policy_struct['compressions'])  # pylint: disable=protected-access
@@ -438,6 +443,8 @@ macs = %s
             p._cakey_sizes = cast(Optional[Dict[str, int]], policy_struct['cakey_sizes'])  # pylint: disable=protected-access
             p._dh_modulus_sizes = cast(Optional[Dict[str, int]], policy_struct['dh_modulus_sizes'])  # pylint: disable=protected-access
             p._server_policy = cast(bool, policy_struct['server_policy'])  # pylint: disable=protected-access
+
+            p._name_and_version = "%s (version %s)" % (p._name, p._version)  # pylint: disable=protected-access
 
         return p
 

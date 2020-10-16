@@ -652,11 +652,15 @@ def process_commandline(args: List[str], usage_cb: Callable[..., None]) -> 'Audi
 
     # If a policy file was provided, validate it.
     if (aconf.policy_file is not None) and (aconf.make_policy is False):
-        try:
-            aconf.policy = Policy(policy_file=aconf.policy_file)
-        except Exception as e:
-            print("Error while loading policy file: %s: %s" % (str(e), traceback.format_exc()))
-            sys.exit(exitcodes.UNKNOWN_ERROR)
+
+        # First, see if this is a built-in policy name.  If not, assume a file path was provided, and try to load it from disk.
+        aconf.policy = Policy.load_builtin_policy(aconf.policy_file)
+        if aconf.policy is None:
+            try:
+                aconf.policy = Policy(policy_file=aconf.policy_file)
+            except Exception as e:
+                print("Error while loading policy file: %s: %s" % (str(e), traceback.format_exc()))
+                sys.exit(exitcodes.UNKNOWN_ERROR)
 
         # If the user wants to do a client audit, but provided a server policy, terminate.
         if aconf.client_audit and aconf.policy.is_server_policy():
